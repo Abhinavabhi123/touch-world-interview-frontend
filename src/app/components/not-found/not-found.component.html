@@ -1,0 +1,30 @@
+<div class="not-found-wrapper">
+  <!-- Decorative background elements -->
+  <div class="decor-sphere decor-1" aria-hidden="true"></div>
+  <div class="decor-sphere decor-2" aria-hidden="true"></div>
+
+  <mat-card class="not-found-card" appearance="outlined">
+    <div class="icon-badge">
+      <mat-icon class="search-icon">travel_explore</mat-icon>
+    </div>
+
+    <div class="error-code">404</div>
+    <h1 class="error-title">Page Not Found</h1>
+    <p class="error-desc">
+      Oops! The URL you navigated to does not exist or has been moved.
+    </p>
+
+    <div class="actions-group">
+      <a mat-flat-button color="primary" routerLink="/dashboard" class="action-btn">
+        <mat-icon>dashboard</mat-icon>
+        <span>Back to Dashboard</span>
+      </a>
+
+      <a mat-stroked-button routerLink="/login" class="action-btn">
+        <mat-icon>login</mat-icon>
+        <span>Go to Login</span>
+      </a>
+    </div>
+  </mat-card>
+</div>
+

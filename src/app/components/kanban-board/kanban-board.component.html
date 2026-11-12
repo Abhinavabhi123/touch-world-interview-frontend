@@ -1,0 +1,130 @@
+<div class="kanban-board-wrapper">
+  <!-- Cross-connected drop list group -->
+  <div cdkDropListGroup class="kanban-columns-container">
+    @for (col of columns; track col.id) {
+      <div class="kanban-column" [class]="col.accentClass">
+        <!-- Column Header with Total Tasks Count & Story Points Summary -->
+        <div class="column-header">
+          <div class="col-title-group">
+            <div class="col-icon-box">
+              <mat-icon>{{ col.icon }}</mat-icon>
+            </div>
+            <div class="col-text-meta">
+              <h3 class="col-title">{{ col.title }}</h3>
+              <span class="col-sp-summary">{{ getStoryPointsForColumn(col.id) }} Story Points</span>
+            </div>
+          </div>
+
+          <div class="col-count-pill" [attr.aria-label]="col.title + ' task count'">
+            {{ getTasksForColumn(col.id).length }}
+          </div>
+        </div>
+
+        <!-- Droppable Area for this Column -->
+        <div
+          cdkDropList
+          [id]="col.id"
+          [cdkDropListData]="getTasksForColumn(col.id)"
+          [cdkDropListConnectedTo]="dropListIds"
+          (cdkDropListDropped)="onDrop($event)"
+          class="kanban-drop-list"
+          [attr.aria-label]="col.title + ' drop list'"
+        >
+          @for (task of getTasksForColumn(col.id); track task.id) {
+            <!-- Draggable Task Card -->
+            <div
+              cdkDrag
+              [cdkDragData]="task"
+              class="kanban-card"
+              [class]="'status-card-' + task.status"
+            >
+              <!-- Drag Handle & Card Header -->
+              <div class="card-top-row">
+                <div class="task-id-badge">
+                  <mat-icon class="drag-handle-icon" cdkDragHandle matTooltip="Drag to reorder or move status">
+                    drag_indicator
+                  </mat-icon>
+                  <span class="id-text">#{{ task.id }}</span>
+                </div>
+
+                <div class="task-badges-row">
+                  <!-- Story Points Display (Required) -->
+                  <span class="card-sp-tag" matTooltip="Story Points Estimate">
+                    <mat-icon class="bolt-icon">bolt</mat-icon>
+                    <strong>{{ task.storyPoints }} SP</strong>
+                  </span>
+
+                  <!-- Priority Display (Required) -->
+                  <span
+                    class="card-priority-tag"
+                    [class]="'priority-' + task.priority"
+                    matTooltip="Priority Level"
+                  >
+                    {{ task.priority | uppercase }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Task Title Display (Required) -->
+              <h4 class="card-task-title">{{ task.title }}</h4>
+
+              @if (task.description) {
+                <p class="card-task-desc">{{ task.description }}</p>
+              }
+
+              <!-- Card Bottom Row: Planned Date & Quick Actions -->
+              <div class="card-bottom-row">
+                <!-- Planned Date Display (Required) -->
+                <div class="card-planned-date" [class.no-date]="!task.dueDate">
+                  <mat-icon class="cal-icon">calendar_today</mat-icon>
+                  <span>{{ task.dueDate ? task.dueDate : 'No Planned Date' }}</span>
+                </div>
+
+                <div class="card-actions">
+                  <button
+                    mat-icon-button
+                    class="card-action-btn edit-btn"
+                    (click)="onEdit(task, $event)"
+                    matTooltip="Edit Task & Story Points"
+                    aria-label="Edit task"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+
+                  <button
+                    mat-icon-button
+                    class="card-action-btn delete-btn"
+                    (click)="onDelete(task, $event)"
+                    matTooltip="Delete Task"
+                    aria-label="Delete task"
+                  >
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </div>
+              </div>
+
+              <!-- CDK Drag Custom Preview while dragging -->
+              <div *cdkDragPreview class="kanban-card-preview">
+                <div class="preview-header">
+                  <span class="preview-id">#{{ task.id }}</span>
+                  <span class="card-sp-tag">{{ task.storyPoints }} SP</span>
+                </div>
+                <div class="preview-title">{{ task.title }}</div>
+              </div>
+
+              <!-- CDK Drag Placeholder when moving over drop target -->
+              <div *cdkDragPlaceholder class="kanban-card-placeholder"></div>
+            </div>
+          } @empty {
+            <div class="column-empty-state">
+              <mat-icon class="empty-icon">inbox</mat-icon>
+              <p>No tasks in {{ col.title }}</p>
+              <small>Drag tasks here</small>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
+

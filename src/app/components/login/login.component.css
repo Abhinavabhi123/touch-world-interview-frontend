@@ -1,0 +1,236 @@
+:host {
+  display: block;
+  height: 100vh;
+  height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Page wrapper with subtle background gradient */
+.login-wrapper {
+  position: relative;
+  height: 100vh;
+  height: 100dvh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #eef2f9 0%, #e0e7f7 50%, #f4f6fd 100%);
+  padding: 1.5rem 1rem;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Container to isolate decorative background glowing spheres from causing overflow */
+.background-decor-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Decorative background glowing spheres */
+.background-decor-1 {
+  position: absolute;
+  top: -10%;
+  right: -5%;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(63, 81, 181, 0.18) 0%, rgba(63, 81, 181, 0) 70%);
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+.background-decor-2 {
+  position: absolute;
+  bottom: -10%;
+  left: -5%;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(233, 30, 99, 0.12) 0%, rgba(233, 30, 99, 0) 70%);
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+/* Login container */
+.login-container {
+  width: 100%;
+  max-width: 440px;
+  position: relative;
+  z-index: 1;
+  margin: auto 0;
+}
+
+/* Material card styling */
+.login-card {
+  border-radius: 20px !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  padding: 2.25rem 2rem !important;
+  box-sizing: border-box;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Brand header */
+.brand-header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.brand-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 16px -4px rgba(63, 81, 181, 0.4);
+}
+
+.brand-icon {
+  color: #ffffff;
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+.brand-title {
+  margin: 0 0 0.4rem;
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #1a202c;
+  letter-spacing: -0.02em;
+}
+
+.brand-subtitle {
+  margin: 0;
+  font-size: 0.925rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* Form layout */
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field-group {
+  margin-bottom: 0.5rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.field-icon {
+  color: #94a3b8;
+  margin-right: 0.5rem;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.visibility-toggle-btn {
+  color: #64748b;
+}
+
+.visibility-toggle-btn:hover {
+  color: #1a202c;
+}
+
+/* Submit button */
+.submit-btn {
+  margin-top: 0.75rem !important;
+  height: 48px !important;
+  border-radius: 12px !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+  background-color: #3f51b5 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(63, 81, 181, 0.3) !important;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease !important;
+}
+
+.submit-btn:hover:not([disabled]) {
+  background-color: #303f9f !important;
+  box-shadow: 0 6px 16px rgba(63, 81, 181, 0.4) !important;
+}
+
+.submit-btn:active:not([disabled]) {
+  transform: translateY(1px);
+}
+
+.submit-btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.btn-spinner {
+  margin-right: 0.25rem;
+}
+
+/* Mobile devices (below 480px) */
+@media (max-width: 480px) {
+  .login-wrapper {
+    padding: 1rem 0.75rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .login-card {
+    padding: 1.75rem 1.25rem 1.5rem !important;
+    border-radius: 16px !important;
+  }
+
+  .brand-title {
+    font-size: 1.45rem;
+  }
+
+  .brand-subtitle {
+    font-size: 0.85rem;
+  }
+}
+
+/* Extra small devices (below 340px) */
+@media (max-width: 340px) {
+  .login-card {
+    padding: 1.25rem 0.875rem !important;
+  }
+
+  .brand-icon-wrapper {
+    width: 48px;
+    height: 48px;
+  }
+
+  .brand-title {
+    font-size: 1.3rem;
+  }
+}
+
+/* Enable scrolling only on extremely short viewports (e.g. landscape phones) to prevent clipping */
+@media (max-height: 520px) {
+  :host,
+  .login-wrapper {
+    overflow-y: auto !important;
+    height: auto !important;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+}
+

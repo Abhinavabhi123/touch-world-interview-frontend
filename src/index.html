@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Touchworld</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- Google Fonts: Roboto and Material Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body class="mat-typography mat-app-background">
+  <app-root>
+    <!-- Instant initial reload loader before Angular bundles compile -->
+    <div style="position:fixed;inset:0;width:100vw;height:100vh;background:#0f172a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999999;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+      <div style="position:relative;width:76px;height:76px;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;">
+        <div style="position:absolute;inset:0;border-radius:50%;border:4px solid rgba(255,255,255,0.1);border-top-color:#4f46e5;border-right-color:#6366f1;animation:initialSpin 0.85s linear infinite;"></div>
+        <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#ffffff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(79,70,229,0.35);font-size:20px;font-weight:700;">TF</div>
+      </div>
+      <div style="color:#ffffff;font-size:1.2rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:0.25rem;">TaskFlow</div>
+      <div style="color:#94a3b8;font-size:0.85rem;font-weight:500;">Loading application...</div>
+      <style>
+        @keyframes initialSpin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+    </div>
+  </app-root>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!-- Mobile Backdrop Overlay -->
+@if (isMobileOpen) {
+  <div class="sidebar-backdrop" (click)="onCloseMobile()" aria-hidden="true"></div>
+}
+
+<aside
+  class="admin-sidebar"
+  [class.sidebar-collapsed]="isCollapsed"
+  [class.mobile-open]="isMobileOpen"
+  aria-label="Sidebar Navigation"
+>
+  <!-- Sidebar Header with Brand Badge -->
+  <div class="sidebar-header">
+    <div class="sidebar-brand">
+      <div class="brand-badge">
+        <mat-icon>view_kanban</mat-icon>
+      </div>
+      @if (!isCollapsed) {
+        <div class="brand-text">
+          <span class="brand-name">{{ brandTitle }}</span>
+          <span class="brand-tag">{{ brandSubtitle }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Close button on mobile -->
+    <button
+      mat-icon-button
+      class="mobile-close-btn"
+      (click)="onCloseMobile()"
+      aria-label="Close menu"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Navigation Menu Items -->
+  <nav class="sidebar-nav" aria-label="Admin Navigation">
+    <div class="nav-group-title">
+      @if (!isCollapsed) {
+        <span>MAIN WORKFLOW</span>
+      }
+    </div>
+
+    <button
+      type="button"
+      class="nav-item"
+      [class.active]="activeItem === 'dashboard'"
+      (click)="onSelectNav('dashboard')"
+      [matTooltip]="isCollapsed ? 'Dashboard Overview' : ''"
+      matTooltipPosition="right"
+    >
+      <mat-icon class="nav-icon">space_dashboard</mat-icon>
+      @if (!isCollapsed) {
+        <span class="nav-label">Dashboard</span>
+        <span class="nav-badge">{{ taskService.totalTasks() }}</span>
+      }
+    </button>
+
+    <button
+      type="button"
+      class="nav-item"
+      [class.active]="activeItem === 'capacity' || activeItem === 'settings'"
+      (click)="onSelectNav('capacity')"
+      [matTooltip]="isCollapsed ? 'Capacity Settings' : ''"
+      matTooltipPosition="right"
+    >
+      <mat-icon class="nav-icon">settings</mat-icon>
+      @if (!isCollapsed) {
+        <span class="nav-label">Capacity Settings</span>
+        @if (taskService.isWeeklyCapacityExceeded()) {
+          <span class="nav-badge alert-badge">Alert</span>
+        }
+      }
+    </button>
+  </nav>
+
+  <!-- Sidebar Bottom Profile Section -->
+  <div class="sidebar-footer">
+    <div class="admin-profile-card">
+      <div class="profile-avatar">
+        <mat-icon>admin_panel_settings</mat-icon>
+      </div>
+      @if (!isCollapsed) {
+        <div class="profile-meta">
+          <span class="profile-name">{{ authService.currentUser()?.name || 'Super Admin' }}</span>
+          <span class="profile-role">ADMIN</span>
+        </div>
+      }
+      <button
+        mat-icon-button
+        class="sidebar-logout-btn"
+        (click)="onLogout()"
+        matTooltip="Sign Out"
+        aria-label="Logout"
+      >
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </div>
+</aside>
+

@@ -1,0 +1,23 @@
+<!-- Full-Page Navigation & Reload Loader Overlay -->
+@if (loadingService.isLoading()) {
+  <div class="fullpage-loader-overlay" role="progressbar" aria-label="Loading page">
+    <div class="loader-content">
+      <div class="brand-spinner-wrapper">
+        <div class="spinner-ring"></div>
+        <div class="brand-icon-box">
+          <mat-icon>view_kanban</mat-icon>
+        </div>
+      </div>
+      <div class="loader-text-group">
+        <h2 class="loader-brand-title">TaskFlow</h2>
+        <p class="loader-status-msg">{{ loadingService.loadingMessage() }}</p>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Global Sonner Toast Notifications Container -->
+<ngx-sonner-toaster position="top-right" [richColors]="true" [closeButton]="true" />
+
+<!-- Routed Application Views (Dashboard, Login, 404) -->
+<router-outlet />

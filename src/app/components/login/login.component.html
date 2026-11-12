@@ -1,0 +1,94 @@
+<div class="login-wrapper">
+  <!-- Decorative background elements -->
+  <div class="background-decor-container" aria-hidden="true">
+    <div class="background-decor-1"></div>
+    <div class="background-decor-2"></div>
+  </div>
+
+  <div class="login-container">
+    <mat-card class="login-card" appearance="outlined">
+      <!-- Card Header / Brand -->
+      <div class="brand-header">
+        <div class="brand-icon-wrapper">
+          <mat-icon class="brand-icon">lock</mat-icon>
+        </div>
+        <h1 class="brand-title">Welcome Back</h1>
+        <p class="brand-subtitle">Please enter your credentials to access your account</p>
+      </div>
+
+      <mat-card-content>
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate class="login-form">
+          <!-- Email Input Field -->
+          <div class="form-field-group">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email Address</mat-label>
+              <mat-icon matPrefix class="field-icon">mail_outline</mat-icon>
+              <input
+                matInput
+                type="email"
+                formControlName="email"
+                placeholder="name@example.com"
+                autocomplete="email"
+                required
+              />
+              @if (loginForm.get('email')?.invalid && (loginForm.get('email')?.touched || loginForm.get('email')?.dirty)) {
+                <mat-error>{{ getEmailErrorMessage() }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Password Input Field with Show/Hide Toggle -->
+          <div class="form-field-group">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Password</mat-label>
+              <mat-icon matPrefix class="field-icon">lock_outline</mat-icon>
+              <input
+                matInput
+                [type]="hidePassword() ? 'password' : 'text'"
+                formControlName="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required
+              />
+              <!-- Password visibility toggle button -->
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                (click)="togglePasswordVisibility()"
+                [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'"
+                [attr.aria-pressed]="!hidePassword()"
+                class="visibility-toggle-btn"
+              >
+                <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              @if (loginForm.get('password')?.invalid && (loginForm.get('password')?.touched || loginForm.get('password')?.dirty)) {
+                <mat-error>{{ getPasswordErrorMessage() }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            mat-flat-button
+            color="primary"
+            class="full-width submit-btn"
+            type="submit"
+            [disabled]="isLoading()"
+          >
+            <div class="submit-btn-content">
+              @if (isLoading()) {
+                <mat-spinner diameter="20" class="btn-spinner"></mat-spinner>
+                <span>Signing in...</span>
+              } @else {
+                <span>Sign In</span>
+                <mat-icon class="btn-icon">arrow_forward</mat-icon>
+              }
+            </div>
+          </button>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+

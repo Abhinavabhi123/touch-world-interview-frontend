@@ -1,0 +1,822 @@
+<div class="admin-layout" [class.sidebar-collapsed]="isSidebarCollapsed()">
+  <!-- Reusable Sidebar Component -->
+  <app-sidebar
+    [isCollapsed]="isSidebarCollapsed()"
+    [isMobileOpen]="isMobileSidebarOpen()"
+    [activeItem]="activeNavItem()"
+    (closeMobile)="closeMobileSidebar()"
+    (navSelect)="setActiveNav($event)"
+    (filterSelect)="setFilter($event)"
+    (openCapacity)="openCapacitySettings()"
+    (logout)="logout()"
+  ></app-sidebar>
+
+  <div class="admin-main-wrapper">
+    <!-- TOP HEADER -->
+    <header class="admin-header">
+      <div class="header-left">
+        <!-- Toggle button for desktop -->
+        <button
+          mat-icon-button
+          class="desktop-toggle-btn"
+          (click)="toggleSidebar()"
+          aria-label="Toggle sidebar collapse"
+        >
+          <mat-icon>{{ isSidebarCollapsed() ? 'menu_open' : 'menu' }}</mat-icon>
+        </button>
+
+        <!-- Toggle button for mobile -->
+        <button
+          mat-icon-button
+          class="mobile-toggle-btn"
+          (click)="toggleMobileSidebar()"
+          aria-label="Open mobile navigation"
+        >
+          <mat-icon>menu</mat-icon>
+        </button>
+
+        <div class="header-breadcrumbs">
+          <span class="breadcrumb-root">Admin Portal</span>
+          <mat-icon class="breadcrumb-chevron">chevron_right</mat-icon>
+          <span class="breadcrumb-current">Dashboard</span>
+        </div>
+
+        <div class="sprint-status-pill">
+          <span class="pulse-dot"></span>
+          <span>Sprint 4 • Active</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <!-- Header Quick Action: Settings / Capacity Limits -->
+        <button
+          mat-stroked-button
+          class="header-btn-secondary"
+          (click)="openCapacitySettings()"
+        >
+          <mat-icon>settings</mat-icon>
+          <span class="btn-text">Capacity Settings</span>
+        </button>
+
+        <!-- Header Quick Action: New Task -->
+        <button
+          mat-flat-button
+          color="primary"
+          class="header-btn-primary"
+          (click)="openCreateTaskModal()"
+        >
+          <mat-icon>add</mat-icon>
+          <span class="btn-text">Create Task</span>
+        </button>
+
+        <!-- Profile Menu Dropdown -->
+        <button
+          type="button"
+          [matMenuTriggerFor]="profileMenu"
+          class="user-menu-btn"
+          aria-label="User account menu"
+        >
+          <div class="user-avatar-circle">
+            {{ (authService.currentUser()?.name || 'A').charAt(0).toUpperCase() }}
+          </div>
+          <span class="user-display-name">
+            {{ authService.currentUser()?.name || authService.currentUser()?.email || 'Admin' }}
+          </span>
+          <mat-icon class="dropdown-icon">expand_more</mat-icon>
+        </button>
+
+        <mat-menu #profileMenu="matMenu" xPosition="before">
+          <div class="menu-user-header">
+            <strong>{{ authService.currentUser()?.name || 'Super Admin' }}</strong>
+            <small>{{ authService.currentUser()?.email || 'admin@test.com' }}</small>
+          </div>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()" class="menu-logout-item">
+            <mat-icon color="warn">logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </div>
+    </header>
+
+    <!-- DASHBOARD CONTENT BODY -->
+    <main class="admin-content">
+      <!-- Capacity Exceeded Warning Banner -->
+      @if (taskService.isWeeklyCapacityExceeded()) {
+        <div class="capacity-alert-banner" role="alert">
+          <mat-icon class="alert-icon">warning_amber</mat-icon>
+          <div class="alert-message">
+            <strong>Weekly Capacity Exceeded!</strong>
+            Active workload ({{ taskService.activeStoryPoints() }} SP) exceeds your weekly limit of
+            {{ taskService.capacityConfig().weeklyLimitStoryPoints }} SP. Please re-estimate or move tasks back to the backlog.
+          </div>
+        </div>
+      }
+
+      <!-- 6 SUMMARY METRIC CARDS -->
+      <section class="summary-section" aria-label="Task Summary Metrics">
+        <!-- 1. Total Tasks -->
+        <mat-card class="metric-card metric-total">
+          <div class="card-inner">
+            <div class="metric-icon-box total-icon">
+              <mat-icon>format_list_bulleted</mat-icon>
+            </div>
+            <div class="metric-info">
+              <span class="metric-label">Total Tasks</span>
+              <div class="metric-value">{{ taskService.totalTasks() }}</div>
+              <span class="metric-meta">All tasks in workflow</span>
+            </div>
+          </div>
+        </mat-card>
+
+        <!-- 2. Backlog Tasks -->
+        <mat-card class="metric-card metric-backlog">
+          <div class="card-inner">
+            <div class="metric-icon-box backlog-icon">
+              <mat-icon>inventory_2</mat-icon>
+            </div>
+            <div class="metric-info">
+              <span class="metric-label">Backlog Tasks</span>
+              <div class="metric-value">{{ taskService.backlogTasks() }}</div>
+              <span class="metric-meta">{{ taskService.backlogStoryPoints() }} Story Points</span>
+            </div>
+          </div>
+        </mat-card>
+
+        <!-- 3. Planned Tasks -->
+        <mat-card class="metric-card metric-planned">
+          <div class="card-inner">
+            <div class="metric-icon-box planned-icon">
+              <mat-icon>event_note</mat-icon>
+            </div>
+            <div class="metric-info">
+              <span class="metric-label">Planned Tasks</span>
+              <div class="metric-value">{{ taskService.plannedTasks() }}</div>
+              <span class="metric-meta">{{ taskService.plannedStoryPoints() }} Story Points</span>
+            </div>
+          </div>
+        </mat-card>
+
+        <!-- 4. In Progress Tasks -->
+        <mat-card class="metric-card metric-inprogress">
+          <div class="card-inner">
+            <div class="metric-icon-box inprogress-icon">
+              <mat-icon>pending_actions</mat-icon>
+            </div>
+            <div class="metric-info">
+              <span class="metric-label">In Progress Tasks</span>
+              <div class="metric-value">{{ taskService.inProgressTasks() }}</div>
+              <span class="metric-meta">{{ taskService.inProgressStoryPoints() }} Story Points</span>
+            </div>
+          </div>
+        </mat-card>
+
+        <!-- 5. Completed Tasks -->
+        <mat-card class="metric-card metric-completed">
+          <div class="card-inner">
+            <div class="metric-icon-box completed-icon">
+              <mat-icon>task_alt</mat-icon>
+            </div>
+            <div class="metric-info">
+              <span class="metric-label">Completed Tasks</span>
+              <div class="metric-value">{{ taskService.completedTasks() }}</div>
+              <span class="metric-meta">{{ taskService.completedStoryPoints() }} Story Points</span>
+            </div>
+          </div>
+        </mat-card>
+
+        <!-- 6. Total Story Points -->
+        <mat-card class="metric-card metric-points">
+          <div class="card-inner">
+            <div class="metric-icon-box points-icon">
+              <mat-icon>speed</mat-icon>
+            </div>
+            <div class="metric-info">
+              <span class="metric-label">Total Story Points</span>
+              <div class="metric-value">{{ taskService.totalStoryPoints() }}</div>
+              <span class="metric-meta">Active: {{ taskService.activeStoryPoints() }} SP</span>
+            </div>
+          </div>
+        </mat-card>
+      </section>
+
+      <!-- Capacity & Sprint Workload Progress Card -->
+      <mat-card class="capacity-card">
+        <div class="capacity-header">
+          <div class="capacity-title-group">
+            <mat-icon class="capacity-icon">analytics</mat-icon>
+            <div>
+              <h2 class="capacity-title">Capacity & Sprint Workload</h2>
+              <p class="capacity-subtitle">Real-time workload vs configured capacity limits</p>
+            </div>
+          </div>
+
+          <div class="capacity-limits-badge">
+            <span class="limit-item">
+              <strong>Daily Limit:</strong> {{ taskService.capacityConfig().dailyLimitStoryPoints }} SP
+            </span>
+            <span class="limit-divider">•</span>
+            <span class="limit-item">
+              <strong>Weekly Limit:</strong> {{ taskService.capacityConfig().weeklyLimitStoryPoints }} SP
+            </span>
+          </div>
+        </div>
+
+        <div class="capacity-meter">
+          <div class="meter-info-row">
+            <span class="meter-label">
+              Active Workload (Planned + In-Progress):
+              <strong>{{ taskService.activeStoryPoints() }} SP</strong>
+            </span>
+            <span class="meter-percent" [class.text-danger]="taskService.isWeeklyCapacityExceeded()">
+              {{ taskService.weeklyCapacityUsagePercent() }}% capacity utilized
+            </span>
+          </div>
+
+          <mat-progress-bar
+            mode="determinate"
+            [value]="taskService.weeklyCapacityUsagePercent()"
+            [color]="taskService.isWeeklyCapacityExceeded() ? 'warn' : 'primary'"
+            class="custom-progress-bar"
+          ></mat-progress-bar>
+        </div>
+      </mat-card>
+
+      <!-- Task Management Section -->
+      <section class="tasks-section">
+        <div class="tasks-header">
+          <div class="tasks-title-group">
+            <h2 class="section-title">Sprint Tasks Workflow</h2>
+            <div class="view-switcher-pills">
+              <button
+                type="button"
+                class="view-pill"
+                [class.active]="currentViewMode() === 'kanban'"
+                (click)="setViewMode('kanban')"
+                matTooltip="Interactive Drag & Drop Kanban Board"
+              >
+                <mat-icon class="view-pill-icon">view_kanban</mat-icon>
+                <span>Kanban Board</span>
+              </button>
+              <button
+                type="button"
+                class="view-pill"
+                [class.active]="currentViewMode() === 'grid'"
+                (click)="setViewMode('grid')"
+                matTooltip="Filtered Grid Cards"
+              >
+                <mat-icon class="view-pill-icon">grid_view</mat-icon>
+                <span>Grid View</span>
+              </button>
+            </div>
+          </div>
+
+          @if (currentViewMode() === 'grid') {
+            <!-- Filter Tabs for Grid View -->
+            <div class="filter-pills" role="tablist">
+              <button
+                type="button"
+                class="filter-pill"
+                [class.active]="selectedFilter() === 'all'"
+                (click)="setFilter('all')"
+              >
+                All ({{ taskService.totalTasks() }})
+              </button>
+              <button
+                type="button"
+                class="filter-pill"
+                [class.active]="selectedFilter() === 'backlog'"
+                (click)="setFilter('backlog')"
+              >
+                Backlog ({{ taskService.backlogTasks() }})
+              </button>
+              <button
+                type="button"
+                class="filter-pill"
+                [class.active]="selectedFilter() === 'planned'"
+                (click)="setFilter('planned')"
+              >
+                Planned ({{ taskService.plannedTasks() }})
+              </button>
+              <button
+                type="button"
+                class="filter-pill"
+                [class.active]="selectedFilter() === 'in-progress'"
+                (click)="setFilter('in-progress')"
+              >
+                In Progress ({{ taskService.inProgressTasks() }})
+              </button>
+              <button
+                type="button"
+                class="filter-pill"
+                [class.active]="selectedFilter() === 'completed'"
+                (click)="setFilter('completed')"
+              >
+                Completed ({{ taskService.completedTasks() }})
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- SEARCH, FILTERING & SORTING TOOLBAR -->
+        <div class="task-toolbar" aria-label="Task Search and Filters">
+          <!-- Real-Time Search Box -->
+          <div class="search-input-wrapper">
+            <mat-icon class="search-icon">search</mat-icon>
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Search tasks by title, ID, or description..."
+              [value]="searchQuery()"
+              (input)="onSearchInput($any($event.target).value)"
+              aria-label="Search tasks"
+            />
+            @if (searchQuery()) {
+              <button
+                mat-icon-button
+                class="clear-search-btn"
+                (click)="clearSearch()"
+                aria-label="Clear search"
+                matTooltip="Clear search"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+          </div>
+
+          <div class="toolbar-controls-group">
+            <!-- Priority Filter Dropdown -->
+            <div class="filter-dropdown-wrapper">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="toolbar-select">
+                <mat-label>Priority</mat-label>
+                <mat-select [value]="selectedPriority()" (selectionChange)="onPriorityChange($event.value)">
+                  <mat-option value="all">All Priorities</mat-option>
+                  <mat-option value="urgent">Urgent</mat-option>
+                  <mat-option value="high">High</mat-option>
+                  <mat-option value="medium">Medium</mat-option>
+                  <mat-option value="low">Low</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            @if (currentViewMode() === 'grid') {
+              <!-- Story Points Filter Dropdown -->
+              <div class="filter-dropdown-wrapper">
+                <mat-form-field appearance="outline" subscriptSizing="dynamic" class="toolbar-select">
+                  <mat-label>Story Points</mat-label>
+                  <mat-select [value]="selectedStoryPoints()" (selectionChange)="onStoryPointsChange($event.value)">
+                    <mat-option value="all">All Story Points</mat-option>
+                    <mat-option value="1-3">1 - 3 SP (Small)</mat-option>
+                    <mat-option value="5-8">5 - 8 SP (Medium)</mat-option>
+                    <mat-option value="13+">13+ SP (Large)</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <!-- Sort Field & Direction -->
+              <div class="sort-controls-wrapper">
+                <mat-form-field appearance="outline" subscriptSizing="dynamic" class="toolbar-select sort-select">
+                  <mat-label>Sort By</mat-label>
+                  <mat-select [value]="sortBy()" (selectionChange)="setSortField($event.value)">
+                    <mat-option value="createdAt">Date Created</mat-option>
+                    <mat-option value="dueDate">Due Date</mat-option>
+                    <mat-option value="storyPoints">Story Points</mat-option>
+                    <mat-option value="priority">Priority</mat-option>
+                    <mat-option value="title">Title (A-Z)</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <button
+                  mat-icon-button
+                  class="sort-order-btn"
+                  (click)="toggleSortOrder()"
+                  [matTooltip]="sortOrder() === 'asc' ? 'Ascending (Low-to-High / A-Z)' : 'Descending (High-to-Low / Z-A)'"
+                  aria-label="Toggle sort direction"
+                >
+                  <mat-icon>{{ sortOrder() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                </button>
+              </div>
+            }
+
+            <!-- Reset Filters Action -->
+            @if (hasActiveFilters()) {
+              <button
+                mat-stroked-button
+                class="reset-filters-btn"
+                (click)="resetAllFilters()"
+                matTooltip="Reset all searches, filters, and sort options"
+              >
+                <mat-icon>filter_alt_off</mat-icon>
+                <span>Reset</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        @if (currentViewMode() === 'kanban') {
+          <!-- Angular CDK Drag & Drop Kanban Board with live search & priority inputs -->
+          <app-kanban-board
+            [searchQuery]="searchQuery()"
+            [selectedPriority]="selectedPriority()"
+            (editTask)="openEditTaskModal($event)"
+          ></app-kanban-board>
+        } @else {
+          <!-- Task Cards Grid (Paginated) -->
+          <div class="tasks-grid">
+            @for (task of paginatedTasks(); track task.id) {
+              <mat-card class="task-card" [class]="'status-border-' + task.status">
+                <div class="task-card-header">
+                  <span class="task-id">#{{ task.id }}</span>
+                  <div class="task-badges">
+                    <span class="sp-badge" matTooltip="Estimated Story Points">
+                      <mat-icon class="sp-icon">bolt</mat-icon>
+                      {{ task.storyPoints }} SP
+                    </span>
+                    <span class="priority-badge" [class]="'priority-' + task.priority">
+                      {{ task.priority | uppercase }}
+                    </span>
+                  </div>
+                </div>
+
+                <h3 class="task-title">{{ task.title }}</h3>
+                @if (task.description) {
+                  <p class="task-description">{{ task.description }}</p>
+                }
+
+                @if (task.dueDate) {
+                  <div class="task-date-pill">
+                    <mat-icon class="date-icon">calendar_today</mat-icon>
+                    <span>Due: {{ task.dueDate }}</span>
+                  </div>
+                }
+
+                <div class="task-card-footer">
+                  <div class="status-select-wrapper">
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="status-dropdown">
+                      <mat-label>Status</mat-label>
+                      <mat-select [value]="task.status" (selectionChange)="changeStatus(task.id, $event.value)">
+                        <mat-option value="backlog">Backlog</mat-option>
+                        <mat-option value="planned">Planned</mat-option>
+                        <mat-option value="in-progress">In Progress</mat-option>
+                        <mat-option value="completed">Completed</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+
+                  <div class="card-action-buttons">
+                    <button
+                      mat-icon-button
+                      color="primary"
+                      (click)="openEditTaskModal(task)"
+                      matTooltip="Edit task & verify capacity"
+                      aria-label="Edit task"
+                      class="edit-btn"
+                    >
+                      <mat-icon>edit</mat-icon>
+                    </button>
+
+                    <button
+                      mat-icon-button
+                      color="warn"
+                      (click)="removeTask(task.id)"
+                      matTooltip="Delete task"
+                      aria-label="Delete task"
+                      class="delete-btn"
+                    >
+                      <mat-icon>delete_outline</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </mat-card>
+            } @empty {
+              <div class="empty-state">
+                <mat-icon class="empty-icon">search_off</mat-icon>
+                <p class="empty-text">No tasks match your search or filter criteria.</p>
+                @if (hasActiveFilters()) {
+                  <button mat-stroked-button color="primary" class="empty-reset-btn" (click)="resetAllFilters()">
+                    <mat-icon>refresh</mat-icon>
+                    <span>Reset All Filters</span>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- PAGINATION BAR FOR GRID VIEW -->
+          @if (totalFilteredTasks() > 0) {
+            <div class="pagination-bar" aria-label="Tasks pagination">
+              <div class="pagination-info">
+                <span class="range-text">Showing <strong>{{ paginationRangeText() }}</strong> tasks</span>
+                <div class="page-size-selector">
+                  <label for="pageSizeSelect">Show:</label>
+                  <select
+                    id="pageSizeSelect"
+                    class="page-size-select"
+                    [value]="pageSize()"
+                    (change)="changePageSize($any($event.target).value)"
+                  >
+                    @for (opt of pageSizeOptions; track opt) {
+                      <option [value]="opt">{{ opt }} / page</option>
+                    }
+                  </select>
+                </div>
+              </div>
+
+              <div class="pagination-controls">
+                <button
+                  mat-icon-button
+                  class="page-nav-btn"
+                  [disabled]="currentPage() === 1"
+                  (click)="goToPage(1)"
+                  matTooltip="First Page"
+                  aria-label="First page"
+                >
+                  <mat-icon>first_page</mat-icon>
+                </button>
+
+                <button
+                  mat-icon-button
+                  class="page-nav-btn"
+                  [disabled]="currentPage() === 1"
+                  (click)="prevPage()"
+                  matTooltip="Previous Page"
+                  aria-label="Previous page"
+                >
+                  <mat-icon>chevron_left</mat-icon>
+                </button>
+
+                <div class="page-number-pills">
+                  @for (p of pageNumbers(); track p) {
+                    <button
+                      type="button"
+                      class="page-pill"
+                      [class.active]="p === currentPage()"
+                      (click)="goToPage(p)"
+                      [attr.aria-label]="'Page ' + p"
+                    >
+                      {{ p }}
+                    </button>
+                  }
+                </div>
+
+                <button
+                  mat-icon-button
+                  class="page-nav-btn"
+                  [disabled]="currentPage() === totalPages()"
+                  (click)="nextPage()"
+                  matTooltip="Next Page"
+                  aria-label="Next page"
+                >
+                  <mat-icon>chevron_right</mat-icon>
+                </button>
+
+                <button
+                  mat-icon-button
+                  class="page-nav-btn"
+                  [disabled]="currentPage() === totalPages()"
+                  (click)="goToPage(totalPages())"
+                  matTooltip="Last Page"
+                  aria-label="Last page"
+                >
+                  <mat-icon>last_page</mat-icon>
+                </button>
+              </div>
+            </div>
+          }
+        }
+      </section>
+    </main>
+  </div>
+
+  <!-- =========================================================================
+       CREATE / EDIT TASK MODAL WITH REAL-TIME CAPACITY VALIDATION
+       ========================================================================= -->
+  @if (isCreateTaskOpen()) {
+    <div class="modal-backdrop" (click)="closeCreateTaskModal()">
+      <div class="modal-dialog modal-dialog-lg" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ editingTaskId() ? 'Edit Task #' + editingTaskId() : 'Create New Task' }}</h2>
+          <button mat-icon-button (click)="closeCreateTaskModal()" aria-label="Close dialog">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <form [formGroup]="taskForm" (ngSubmit)="submitTask()" class="modal-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Task Title</mat-label>
+            <input matInput formControlName="title" placeholder="e.g., Integrate payment gateway" required />
+            @if (taskForm.get('title')?.invalid && taskForm.get('title')?.touched) {
+              <mat-error>Title is required (min 3 characters)</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Description (Optional)</mat-label>
+            <textarea
+              matInput
+              formControlName="description"
+              rows="2"
+              placeholder="Add task context or acceptance criteria"
+            ></textarea>
+          </mat-form-field>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Workflow Status</mat-label>
+              <mat-select formControlName="status">
+                <mat-option value="backlog">Backlog</mat-option>
+                <mat-option value="planned">Planned</mat-option>
+                <mat-option value="in-progress">In Progress</mat-option>
+                <mat-option value="completed">Completed</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Story Points (Fibonacci)</mat-label>
+              <mat-select formControlName="storyPoints">
+                @for (pt of storyPointOptions; track pt) {
+                  <mat-option [value]="pt">{{ pt }} SP</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Priority</mat-label>
+              <mat-select formControlName="priority">
+                <mat-option value="low">Low</mat-option>
+                <mat-option value="medium">Medium</mat-option>
+                <mat-option value="high">High</mat-option>
+                <mat-option value="urgent">Urgent</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Selected Planned / Due Date</mat-label>
+              <input matInput type="date" formControlName="dueDate" required />
+            </mat-form-field>
+          </div>
+
+          <!-- =========================================================================
+               REAL-TIME CAPACITY PLANNING ASSESSMENT
+               Calculates:
+               1. Story Points already planned for the selected day
+               2. Story Points already planned for the selected week
+               3. Remaining Daily Capacity
+               4. Remaining Weekly Capacity
+               If exceeded: Displays validation message & PREVENTS saving
+               ========================================================================= -->
+          <div
+            class="capacity-assessment-card"
+            [class.assessment-exceeded]="currentCapacityAssessment().isExceeded"
+            [class.assessment-optimal]="!currentCapacityAssessment().isExceeded"
+          >
+            <div class="assessment-title-row">
+              <mat-icon class="assessment-status-icon">
+                {{ currentCapacityAssessment().isExceeded ? 'report_problem' : 'verified' }}
+              </mat-icon>
+              <div class="assessment-title-text">
+                <strong>Capacity Assessment for Selected Date: {{ currentCapacityAssessment().selectedDate }}</strong>
+                <span class="assessment-status-tag">
+                  {{ currentCapacityAssessment().isExceeded ? 'CAPACITY EXCEEDED' : 'WITHIN CAPACITY' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="assessment-metrics-grid">
+              <!-- Metric 1: Planned for Selected Day -->
+              <div class="assessment-metric-box">
+                <span class="metric-box-label">Story Points Planned (Selected Day)</span>
+                <span class="metric-box-val">{{ currentCapacityAssessment().plannedDayStoryPoints }} SP</span>
+              </div>
+
+              <!-- Metric 2: Planned for Selected Week -->
+              <div class="assessment-metric-box">
+                <span class="metric-box-label">Story Points Planned (Selected Week)</span>
+                <span class="metric-box-val">{{ currentCapacityAssessment().plannedWeekStoryPoints }} SP</span>
+              </div>
+
+              <!-- Metric 3: Remaining Daily Capacity -->
+              <div
+                class="assessment-metric-box"
+                [class.metric-box-danger]="currentCapacityAssessment().exceedsDaily"
+              >
+                <span class="metric-box-label">Remaining Daily Capacity</span>
+                <span class="metric-box-val">
+                  {{ currentCapacityAssessment().remainingDailyCapacity }} / {{ currentCapacityAssessment().dailyLimit }} SP
+                </span>
+              </div>
+
+              <!-- Metric 4: Remaining Weekly Capacity -->
+              <div
+                class="assessment-metric-box"
+                [class.metric-box-danger]="currentCapacityAssessment().exceedsWeekly"
+              >
+                <span class="metric-box-label">Remaining Weekly Capacity</span>
+                <span class="metric-box-val">
+                  {{ currentCapacityAssessment().remainingWeeklyCapacity }} / {{ currentCapacityAssessment().weeklyLimit }} SP
+                </span>
+              </div>
+            </div>
+
+            <!-- Validation Error Alert Message & Prevention Notice -->
+            @if (currentCapacityAssessment().isExceeded) {
+              <div class="assessment-validation-alert" role="alert">
+                <mat-icon>block</mat-icon>
+                <div class="validation-text">
+                  <strong>Save Blocked:</strong> {{ currentCapacityAssessment().validationMessage }}
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="modal-actions">
+            <button mat-button type="button" (click)="closeCreateTaskModal()" [disabled]="isSubmitting()">
+              Cancel
+            </button>
+            <button
+              mat-flat-button
+              color="primary"
+              type="submit"
+              [disabled]="taskForm.invalid || currentCapacityAssessment().isExceeded || isSubmitting()"
+            >
+              @if (isSubmitting()) {
+                <mat-spinner diameter="18" class="btn-spinner"></mat-spinner>
+                <span>Saving...</span>
+              } @else {
+                <span>{{ editingTaskId() ? 'Update Task' : 'Save Task' }}</span>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- =========================================================================
+       CAPACITY PLANNING SETTINGS MODAL
+       ========================================================================= -->
+  @if (isCapacitySettingsOpen()) {
+    <div class="modal-backdrop" (click)="closeCapacitySettings()">
+      <div class="modal-dialog modal-dialog-lg" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div class="modal-title-with-icon">
+            <mat-icon class="settings-title-icon">settings</mat-icon>
+            <h2>Capacity Planning Settings</h2>
+          </div>
+          <button mat-icon-button (click)="closeCapacitySettings()" aria-label="Close dialog">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <!-- Live Team Capacity Overview -->
+        <div class="settings-overview-card">
+          <h3 class="overview-title">Current Sprint Capacity Status</h3>
+          <div class="overview-grid">
+            <div class="overview-item">
+              <span class="overview-label">Today's Planned Story Points:</span>
+              <strong class="overview-value">{{ todayCapacityOverview().plannedDayStoryPoints }} SP</strong>
+            </div>
+            <div class="overview-item">
+              <span class="overview-label">Today's Remaining Capacity:</span>
+              <strong class="overview-value">{{ todayCapacityOverview().remainingDailyCapacity }} SP</strong>
+            </div>
+            <div class="overview-item">
+              <span class="overview-label">This Week's Planned Story Points:</span>
+              <strong class="overview-value">{{ todayCapacityOverview().plannedWeekStoryPoints }} SP</strong>
+            </div>
+            <div class="overview-item">
+              <span class="overview-label">This Week's Remaining Capacity:</span>
+              <strong class="overview-value">{{ todayCapacityOverview().remainingWeeklyCapacity }} SP</strong>
+            </div>
+          </div>
+        </div>
+
+        <form [formGroup]="capacityForm" (ngSubmit)="saveCapacitySettings()" class="modal-form">
+          <p class="modal-note">
+            Configure the maximum story points that the engineering team can plan per day and per sprint week.
+            Any task addition or update exceeding these boundaries is automatically validated and prevented from saving.
+          </p>
+
+          <mat-form-field appearance="outline" class="full-width form-field-spaced">
+            <mat-label>Daily Capacity Limit (Story Points)</mat-label>
+            <input matInput type="number" formControlName="dailyLimit" min="1" max="50" required />
+            <mat-hint>Default: 8 SP (range: 1 – 50 SP / day)</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width form-field-spaced">
+            <mat-label>Weekly Capacity Limit (Story Points)</mat-label>
+            <input matInput type="number" formControlName="weeklyLimit" min="1" max="200" required />
+            <mat-hint>Default: 40 SP (range: 1 – 200 SP / week)</mat-hint>
+          </mat-form-field>
+
+          <div class="modal-actions">
+            <button mat-button type="button" (click)="closeCapacitySettings()">Cancel</button>
+            <button mat-flat-button color="primary" type="submit">Save Capacity Settings</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>
